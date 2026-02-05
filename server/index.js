@@ -28,18 +28,20 @@ app.use(helmet());
 app.use(compression());
 
 // CORS - Allow local development and production
+// CORS - Allow local development and production
 const allowedOrigins = [
     'http://localhost:5173',
     'http://localhost:3000',
+    'https://examapp-self.vercel.app', // Hardcoded fallback
     process.env.CLIENT_URL // Production frontend URL (Vercel)
-].filter(Boolean);
+].filter(Boolean).map(url => url.replace(/\/$/, '')); // Remove trailing slashes
 
 app.use(cors({
     origin: function(origin, callback) {
         // Allow requests with no origin (Postman, mobile apps)
         if (!origin) return callback(null, true);
         
-        if (allowedOrigins.indexOf(origin) !== -1) {
+        if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.indexOf(origin.replace(/\/$/, '')) !== -1) {
             callback(null, true);
         } else {
             console.log('CORS blocked origin:', origin);
