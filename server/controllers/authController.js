@@ -19,7 +19,11 @@ const loginUser = async (req, res) => {
 
         if (!user) {
             console.log('User NOT found');
-            return res.status(401).json({ message: 'Invalid username or password (User not found)' });
+            const mongoose = require('mongoose');
+            return res.status(401).json({ 
+                message: `Invalid username or password (User not found in DB: ${mongoose.connection.name})`,
+                db: mongoose.connection.name 
+            });
         }
 
         const isMatch = await user.comparePassword(password);
