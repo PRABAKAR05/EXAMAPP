@@ -14,24 +14,34 @@ const loginUser = async (req, res) => {
     const { username, password } = req.body;
 
     try {
+        console.log(`Login attempt for: ${username}`);
         const user = await User.findOne({ username });
 
-        if (user && (await user.comparePassword(password))) {
-            if (user.isDisabled) {
-                return res.status(403).json({ message: 'Account is disabled. Contact Admin.' });
-            }
-
-            res.json({
-                _id: user._id,
-                username: user.username,
-                role: user.role,
-                isFirstLogin: user.isFirstLogin,
-                token: generateToken(user._id, user.role)
-            });
-        } else {
-            res.status(401).json({ message: 'Invalid username or password' });
+        if (!user) {
+            console.log('User NOT found');
+            return res.status(401).json({ message: 'Invalid username or password (User not found)' });
         }
+
+        const isMatch = await user.comparePassword(password);
+        if (!isMatch) {
+            console.log('Password mismatch');
+            return res.status(401).json({ message: 'Invalid username or password (Wrong password)' });
+        }
+
+        if (user.isDisabled) {
+            return res.status(403).json({ message: 'Account is disabled. Contact Admin.' });
+        }
+
+        res.json({
+            _id: user._id,
+            username: user.username,
+            role: user.role,
+            isFirstLogin: user.isFirstLogin,
+            token: generateToken(user._id, user.role)
+        });
+
     } catch (error) {
+        console.error('Login Error:', error);
         res.status(500).json({ message: 'Server Error' });
     }
 };
