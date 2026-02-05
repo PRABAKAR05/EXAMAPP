@@ -32,23 +32,28 @@ app.use(compression());
 const allowedOrigins = [
     'http://localhost:5173',
     'http://localhost:3000',
-    'https://examapp-self.vercel.app', // Hardcoded fallback
-    process.env.CLIENT_URL // Production frontend URL (Vercel)
-].filter(Boolean).map(url => url.replace(/\/$/, '')); // Remove trailing slashes
+    process.env.CLIENT_URL
+].filter(Boolean).map(url => url ? url.replace(/\/$/, '') : '');
 
 app.use(cors({
     origin: function(origin, callback) {
         // Allow requests with no origin (Postman, mobile apps)
         if (!origin) return callback(null, true);
         
-        if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.indexOf(origin.replace(/\/$/, '')) !== -1) {
+        // Dynamic Check: Allow any Vercel deployment or Localhost
+        if (
+            allowedOrigins.indexOf(origin) !== -1 || 
+            origin.endsWith('.vercel.app') || 
+            origin.includes('localhost')
+        ) {
             callback(null, true);
         } else {
             console.log('CORS blocked origin:', origin);
             callback(new Error('Not allowed by CORS'));
         }
     },
-    credentials: true
+    credentials: true,
+    optionsSuccessStatus: 200
 }));
 
 app.use(morgan('dev'));
