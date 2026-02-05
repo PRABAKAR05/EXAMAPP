@@ -59,55 +59,7 @@ app.use('/api/admin/classes', classRoutes);
 app.use('/api/teacher', teacherRoutes);
 app.use('/api/student', studentRoutes);
 
-// Public Diagnostic Endpoint
-app.get('/api/diagnose', async (req, res) => {
-    try {
-        const mongoose = require('mongoose');
-        const User = require('./models/User');
-
-        const dbState = mongoose.connection.readyState;
-        const dbName = mongoose.connection.name;
-        const host = mongoose.connection.host;
-        
-        const userCount = await User.countDocuments();
-        const adminExists = await User.findOne({ username: 'admin' }).select('username email role');
-
-        res.json({
-            status: 'ok',
-            environment: process.env.NODE_ENV,
-            db: {
-                state: dbState === 1 ? 'Connected' : 'Disconnected',
-                name: dbName,
-                host: host
-            },
-            users: {
-                total: userCount,
-                admin: adminExists ? 'FOUND' : 'MISSING',
-                adminDetails: adminExists
-            },
-            timestamp: new Date().toISOString()
-        });
-    } catch (error) {
-        res.status(500).json({ error: error.message, stack: error.stack });
-    }
-});
-
-app.get('/', (req, res) => {
-    res.json({ message: 'Welcome to the Online Exam System API' });
-});
-
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
-    
-    // AUTO-DIAGNOSE ON STARTUP (Run only once in production)
-    if (process.env.NODE_ENV === 'production' || process.env.MONGODB_URI) {
-        console.log('Running DB Diagnostic...');
-        const { exec } = require('child_process');
-        exec('node diagnose_db.js', (error, stdout, stderr) => {
-            if (error) console.error(`Diagnostic Error: ${error}`);
-            if (stderr) console.error(`Diagnostic Stderr: ${stderr}`);
-            if (stdout) console.log(stdout); // This will print to Render logs
-        });
-    }
 });
 
