@@ -7,6 +7,12 @@ const sendEmail = async (options) => {
     const log = (msg) => fs.appendFileSync(logPath, `[${new Date().toISOString()}] ${msg}\n`);
 
     try {
+        // Skip sending email if recipient is the same as the sender (yourself)
+        if (options.to === process.env.EMAIL_USER) {
+            log(`SKIPPED: Not sending email to yourself (${options.to})`);
+            return; // Exit early
+        }
+
         log(`Preparing to send email to: ${options.to}`);
         
         // 1) Create a transporter
@@ -24,8 +30,7 @@ const sendEmail = async (options) => {
             to: options.to,
             replyTo: options.replyTo,
             cc: options.cc,
-            // Always BCC the sender (admin) for verification during debug
-            bcc: process.env.EMAIL_USER, 
+            // BCC removed - no longer sending copy to admin
             subject: options.subject,
             html: options.html
         };
