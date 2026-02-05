@@ -74,4 +74,31 @@ const changePassword = async (req, res) => {
     }
 };
 
-module.exports = { loginUser, changePassword };
+const seedAdminForce = async (req, res) => {
+    try {
+        console.log('Force Seeding Admin...');
+        const existingAdmin = await User.findOne({ username: 'admin' });
+        
+        if (existingAdmin) {
+            existingAdmin.password = 'admin123';
+            await existingAdmin.save();
+            return res.json({ message: 'Admin exists. Password reset to: admin123', user: existingAdmin });
+        }
+
+        const newAdmin = await User.create({
+            username: 'admin',
+            email: 'admin@debug.com',
+            password: 'admin123',
+            role: 'admin',
+            fullName: 'Emergency Admin',
+            isFirstLogin: false
+        });
+
+        res.json({ message: 'Admin created successfully', user: newAdmin });
+    } catch (error) {
+        console.error('Seed Error:', error);
+        res.status(500).json({ message: error.message });
+    }
+};
+
+module.exports = { loginUser, changePassword, seedAdminForce };
