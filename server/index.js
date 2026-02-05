@@ -26,7 +26,29 @@ connectDB();
 // Middleware
 app.use(helmet());
 app.use(compression());
-app.use(cors()); // Allow all origins for local development
+
+// CORS - Allow local development and production
+const allowedOrigins = [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    process.env.CLIENT_URL // Production frontend URL (Vercel)
+].filter(Boolean);
+
+app.use(cors({
+    origin: function(origin, callback) {
+        // Allow requests with no origin (Postman, mobile apps)
+        if (!origin) return callback(null, true);
+        
+        if (allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            console.log('CORS blocked origin:', origin);
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true
+}));
+
 app.use(morgan('dev'));
 app.use(express.json());
 
@@ -43,5 +65,16 @@ app.get('/', (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
+    
+    // AUTO-DIAGNOSE ON STARTUP (Run only once in production)
+    if (process.env.NODE_ENV === 'production' || process.env.MONGODB_URI) {
+        console.log('Running DB Diagnostic...');
+        const { exec } = require('child_process');
+        exec('node diagnose_db.js', (error, stdout, stderr) => {
+            if (error) console.error(`Diagnostic Error: ${error}`);
+            if (stderr) console.error(`Diagnostic Stderr: ${stderr}`);
+            if (stdout) console.log(stdout); // This will print to Render logs
+        });
+    }
 });
 
