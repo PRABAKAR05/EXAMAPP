@@ -46,7 +46,15 @@ const CreateExamPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await api.post('/teacher/exams', formData);
+            // Convert datetime-local strings (local time, no timezone) to UTC ISO strings.
+            // Browser parses "YYYY-MM-DDTHH:mm" as LOCAL time, so toISOString() gives correct UTC.
+            const toUTC = (localStr) => localStr ? new Date(localStr).toISOString() : localStr;
+            const payload = {
+                ...formData,
+                scheduledStart: toUTC(formData.scheduledStart),
+                scheduledEnd: toUTC(formData.scheduledEnd),
+            };
+            const res = await api.post('/teacher/exams', payload);
             navigate(`/teacher/exams/${res.data._id}`); // Redirect to edit/add questions page
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to create exam');
