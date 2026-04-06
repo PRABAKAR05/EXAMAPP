@@ -134,8 +134,9 @@ const CreateExamPage = () => {
                                     if (start && newDuration > 0) {
                                         const startDate = new Date(start);
                                         const endDate = new Date(startDate.getTime() + newDuration * 60000);
-                                        const tzOffset = endDate.getTimezoneOffset() * 60000;
-                                        const localISOTime = (new Date(endDate - tzOffset)).toISOString().slice(0, 16);
+                                        // Format as local datetime (YYYY-MM-DDTHH:mm) without UTC conversion
+                                        const pad = (n) => String(n).padStart(2, '0');
+                                        const localISOTime = `${endDate.getFullYear()}-${pad(endDate.getMonth()+1)}-${pad(endDate.getDate())}T${pad(endDate.getHours())}:${pad(endDate.getMinutes())}`;
                                         newEnd = localISOTime;
                                     }
                                     setFormData({ ...formData, duration: newDuration, scheduledEnd: newEnd });
@@ -172,8 +173,9 @@ const CreateExamPage = () => {
                                     if (newStart && duration > 0) {
                                         const startDate = new Date(newStart);
                                         const endDate = new Date(startDate.getTime() + duration * 60000);
-                                        const tzOffset = endDate.getTimezoneOffset() * 60000;
-                                        const localISOTime = (new Date(endDate - tzOffset)).toISOString().slice(0, 16);
+                                        // Format as local datetime (YYYY-MM-DDTHH:mm) without UTC conversion
+                                        const pad = (n) => String(n).padStart(2, '0');
+                                        const localISOTime = `${endDate.getFullYear()}-${pad(endDate.getMonth()+1)}-${pad(endDate.getDate())}T${pad(endDate.getHours())}:${pad(endDate.getMinutes())}`;
                                         newEnd = localISOTime;
                                     }
                                     setFormData({ ...formData, scheduledStart: newStart, scheduledEnd: newEnd });

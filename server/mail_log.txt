@@ -134,3 +134,7 @@
 [2026-02-05T17:25:16.744Z] Transporter ready. Sending...
 [2026-02-05T17:25:21.089Z] SUCCESS. MessageId: <c0627bcc-b154-41c2-2568-9e91b00ca4fc@gmail.com>
 [2026-02-05T17:25:21.090Z] Response: 250 2.0.0 OK  1770312320 d9443c01a7336-2a933a252f6sm52376865ad.75 - gsmtp
+[2026-04-05T08:23:23.668Z] Preparing to send email to: ppraba0705@gmail.com
+[2026-04-05T08:23:23.683Z] Transporter ready. Sending...
+[2026-04-05T08:23:27.813Z] SUCCESS. MessageId: <fae51734-4a4a-8d62-a062-77263e80aeff@gmail.com>
+[2026-04-05T08:23:27.815Z] Response: 250 2.0.0 OK  1775377408 d2e1a72fcca58-82d11f76c09sm6479214b3a.55 - gsmtp
